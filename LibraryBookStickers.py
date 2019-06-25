@@ -3,12 +3,15 @@ from PIL import Image, ImageDraw, ImageFont
 
 class Sticker:
     def __init__(self, position_in_page: tuple = (None, None), author: str = None, library_location: str = None,
-                 is_fiction: bool = False, font_color: int = 0, background_color: int = 255, font_size: int = 90):
-        self.position = position_in_page[::-1]  # reversing because pillow uses (column_number, row_number)
+                 is_fiction: bool = False, font_color: int = 0, background_color: int = 255, font_size: int = 70):
+        # reversing because pillow uses (column_number, row_number)
+        self.position = position_in_page[::-1]
+        self.position = (self.position[0] - 1,self.position[1] - 1)
         self.author = author
         self.location = library_location
         self.is_fiction = is_fiction
-        self.font = ImageFont.truetype('Pillow/Tests/fonts/FreeMono.ttf', font_size)
+        self.font = ImageFont.truetype(
+            'Pillow/Tests/fonts/FreeSans.ttf', font_size)
         # self.font = ImageFont.truetype('./times-new-roman.ttf', font_size)
         self.font_color = font_color
         self.background_color = background_color
@@ -40,7 +43,8 @@ class StickerSheet:
         self.grid_dim, self.background_color = grid_dim, background_color
 
         self.__calculate_single_sticker_dim()
-        self.__initialize_fiction_icon(fiction_icon_path, fiction_icon_resize_factor)
+        self.__initialize_fiction_icon(
+            fiction_icon_path, fiction_icon_resize_factor)
         self.__initialize_sheet_canvas()
 
     def __initialize_fiction_icon(self, fiction_icon_path: str, fiction_icon_resize_factor: float):
@@ -50,11 +54,13 @@ class StickerSheet:
         self.fiction_icon_dim = self.fiction_icon.size
 
     def __initialize_sheet_canvas(self):
-        self.canvas = Image.new(mode='L', size=self.page_dim, color=self.background_color)
+        self.canvas = Image.new(
+            mode='L', size=self.page_dim, color=self.background_color)
 
     def __calculate_single_sticker_dim(self):
         self.single_sticker_dim = int((self.page_dim[0] - 2 * self.horizontal_margins) / self.grid_dim[0]), \
-                                  int((self.page_dim[1] - 2 * self.vertical_margins) / self.grid_dim[1])
+            int((self.page_dim[1] - 2 *
+                 self.vertical_margins) / self.grid_dim[1])
 
     def __calculate_single_sticker_location_text_offset(self, text: str, draw_context: ImageDraw.Draw,
                                                         font=None) -> tuple:
@@ -95,7 +101,8 @@ class StickerSheet:
                 self.__paste_fiction_icon_onto_sticker(sticker_img=sticker_img)
 
             # adding the currently built sticker to the final sheet at its desired position in the grid
-            self.__paste_sticker_to_grid(cur_sticker=cur_sticker, sticker_img=sticker_img)
+            self.__paste_sticker_to_grid(
+                cur_sticker=cur_sticker, sticker_img=sticker_img)
 
         # after pasting all necessary stickers onto sheet, save the final result to a PNG image file
         self.__save_sheet_to_file(file_name, file_format)
@@ -138,10 +145,12 @@ class StickerSheet:
 
     def __paste_sticker_to_grid(self, cur_sticker: Sticker, sticker_img: Image):
         cur_sticker_2D_pixel_offset_in_sheet = (
-            self.horizontal_margins + cur_sticker.position[0] * self.single_sticker_dim[0],
+            self.horizontal_margins +
+            cur_sticker.position[0] * self.single_sticker_dim[0],
             self.vertical_margins + cur_sticker.position[1] * self.single_sticker_dim[1])
 
-        self.canvas.paste(sticker_img, box=cur_sticker_2D_pixel_offset_in_sheet)
+        self.canvas.paste(
+            sticker_img, box=cur_sticker_2D_pixel_offset_in_sheet)
 
     def __save_sheet_to_file(self, file_name, file_format):
         self.canvas.save(file_name, file_format)
@@ -149,9 +158,8 @@ class StickerSheet:
 
 if __name__ == '__main__':
     sheet = StickerSheet()
-    stickers = [Sticker((0, 0), 'MAS', '55'),
-                Sticker((0, 1), 'MAS', '55'),
-                Sticker((0, 2), 'ידה', '', True)
+    stickers = [Sticker((5, 2), 'PIN', '35')
+
                 ]
     for sticker in stickers:
         sheet.add_sticker(sticker)
